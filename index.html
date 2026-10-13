@@ -3,24 +3,33 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="A minimal League champion trivia prototype." />
-    <title>Ashen Atlas — Prototype</title>
-    <link rel="stylesheet" href="styles.css" />
+    <meta name="description" content="A short League of Legends trivia expedition." />
+    <title>Leagueillion — The First Expedition</title>
+    <link rel="stylesheet" href="styles.css?v=5" />
   </head>
   <body>
-    <main class="game-shell">
-      <p class="eyebrow">ASHEN ATLAS · PROTOTYPE</p>
-      <h1>Name a champion from Demacia</h1>
-      <p class="instruction">Enter one answer. A less obvious valid answer earns more Resonance.</p>
-      <form id="answer-form" novalidate>
-        <label class="sr-only" for="answer">Champion name</label>
-        <input id="answer" name="answer" type="text" autocomplete="off" placeholder="Type a champion name" />
-        <button type="submit">Submit</button>
-      </form>
-      <section id="result" class="result" aria-live="polite" hidden></section>
-      <button id="again" class="again" type="button" hidden>Try another answer</button>
-      <p class="disclaimer">Unofficial fan prototype. Riot Games does not endorse or sponsor this project.</p>
+    <main class="expedition" aria-labelledby="page-title">
+      <header class="masthead">
+        <p class="eyebrow">LEAGUEILLION · FIRST EXPEDITION</p>
+        <h1 id="page-title">A small journey through Runeterra.</h1>
+        <p class="lede">Answer three quick questions and follow the trail east.</p>
+      </header>
+      <section class="map-panel" aria-label="Expedition progress">
+        <div class="map-scroll" id="map-scroll">
+          <div class="route" aria-hidden="true"></div>
+          <div class="traveler" id="traveler" aria-hidden="true"><span>✦</span></div>
+          <div class="landmark start"><span>01</span><b>Demacia</b></div>
+          <div class="landmark middle"><span>02</span><b>Spirit<br />Realm</b></div>
+          <div class="landmark end"><span>03</span><b>Noxus</b></div>
+        </div>
+        <p class="progress-copy"><span id="progress-label">Stop 1 of 3</span><span id="score-label">0 correct</span></p>
+      </section>
+      <section class="question-window" aria-live="polite"><div class="question-track" id="question-track"></div></section>
+      <section class="completion" id="completion" hidden>
+        <p class="eyebrow">EXPEDITION COMPLETE</p><h2>You reached the eastern gate.</h2><p id="final-score"></p><button id="restart" type="button">Walk the route again</button>
+      </section>
+      <p class="disclaimer">Unofficial fan project. Riot Games does not endorse or sponsor this project.</p>
     </main>
-    <script src="app.js"></script>
+    <script src="app.js?v=5"></script>
   </body>
 </html>
