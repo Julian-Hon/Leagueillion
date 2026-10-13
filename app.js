@@ -2,13 +2,13 @@ const answers = [
   { name: "Garen", aliases: ["garen"], tier: "Familiar", points: 10 },
   { name: "Lux", aliases: ["lux", "luxanna", "luxanna crownguard"], tier: "Familiar", points: 10 },
   { name: "Jarvan IV", aliases: ["jarvan", "jarvan iv", "jarvan 4"], tier: "Known", points: 25 },
-  { name: "Fiora", aliases: ["fiora", "fiora laurent"], tier: "Known", points: 25 },
-  { name: "Galio", aliases: ["galio"], tier: "Uncommon", points: 50 },
-  { name: "Quinn", aliases: ["quinn"], tier: "Uncommon", points: 50 },
-  { name: "Vayne", aliases: ["vayne", "shauna vayne"], tier: "Rare", points: 75 },
-  { name: "Shyvana", aliases: ["shyvana"], tier: "Rare", points: 75 },
-  { name: "Sona", aliases: ["sona", "sona buvelle"], tier: "Rare", points: 75 },
-  { name: "Sylas", aliases: ["sylas"], tier: "Legendary", points: 100 }
+  { name: "Sylas", aliases: ["sylas"], tier: "Known", points: 25 },
+  { name: "Fiora", aliases: ["fiora", "fiora laurent"], tier: "Uncommon", points: 50 },
+  { name: "Vayne", aliases: ["vayne", "shauna vayne"], tier: "Uncommon", points: 50 },
+  { name: "Galio", aliases: ["galio"], tier: "Deep Lore", points: 75 },
+  { name: "Sona", aliases: ["sona", "sona buvelle"], tier: "Deep Lore", points: 75 },
+  { name: "Shyvana", aliases: ["shyvana"], tier: "Deep Lore", points: 75 },
+  { name: "Quinn", aliases: ["quinn"], tier: "Legendary", points: 100 }
 ];
 
 const form = document.querySelector("#answer-form");
@@ -25,7 +25,7 @@ form.addEventListener("submit", (event) => {
   if (!submitted) { showResult("<strong>Enter a champion name first.</strong>", "error"); return; }
   const match = answers.find((answer) => answer.aliases.some((alias) => normalize(alias) === submitted));
   if (!match) { showResult("<strong>Not in this prototype's answer bank.</strong> Try another Demacian champion.", "error"); return; }
-  showResult(`<strong>${match.name} — ${match.tier}</strong>+${match.points} Resonance`, "success");
+  showResult(`<strong>${match.name} — ${match.tier}</strong>+${match.points} Resonance · fixed Leagueillion obscurity score`, "success");
   input.disabled = true;
   form.querySelector("button").disabled = true;
   again.hidden = false;
