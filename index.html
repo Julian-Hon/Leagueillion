@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="A new route each day: three timed stops through Runeterra." />
     <title>Daily Expedition — Leagueillion</title>
-    <link rel="stylesheet" href="styles.css?v=13" />
+    <link rel="stylesheet" href="styles.css?v=15" />
   </head>
   <body>
-    <main class="game" id="game">
+    <main class="game" id="game" data-motion="full">
       <div class="scene use-art" id="scene" data-time="day" aria-hidden="true">
         <div class="sky sky--day"></div>
         <div class="sky sky--dusk"></div>
@@ -25,6 +25,7 @@
         <span class="brand-mark" aria-hidden="true">✦</span>
         <span class="topbar-name">DAILY EXPEDITION</span>
         <span class="topbar-edition" id="topbar-date">TODAY'S ROUTE</span>
+        <button class="motion-toggle" id="motion-toggle" type="button" aria-pressed="true" aria-label="Turn animations off">MOTION ON</button>
       </header>
 
       <section class="start-screen" id="start-screen" aria-labelledby="page-title">
@@ -70,6 +71,6 @@
     </main>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase-config.js?v=1"></script>
-    <script src="app.js?v=12"></script>
+    <script src="app.js?v=14"></script>
   </body>
 </html>

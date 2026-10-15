@@ -6,14 +6,14 @@ const fallbackQuestions = [
 const $ = (selector) => document.querySelector(selector);
 const game = $("#game"), scene = $("#scene"), startScreen = $("#start-screen"), playScreen = $("#play-screen"), resultScreen = $("#result-screen"), completeScreen = $("#complete-screen");
 const startButton = $("#start-button"), restartButton = $("#restart-button"), answerForm = $("#answer-form"), answerInput = $("#answer-input"), submitButton = answerForm.querySelector("button");
+const motionButton = $("#motion-toggle");
 const dataStatus = $("#data-status"), timerLabel = $("#timer-label"), timerFill = $("#timer-fill"), timerCell = $(".hud-cell--timer");
 const QUESTION_SECONDS = 30;
 const RESULT_MS = 2300;
-const START_TRAVEL_MS = 2300;
-const TRAVEL_MS = 2300;
-const RESULT_FADE_MS = 650;
-const QUESTION_FADE_MS = 1000;
-const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+const START_FADE_MS = 1700;
+const TRAVEL_MS = 3600;
+const RESULT_FADE_MS = 1100;
+const QUESTION_FADE_MS = 1500;
 let questions = fallbackQuestions;
 let nextQuestions = fallbackQuestions;
 let current = 0;
@@ -79,7 +79,23 @@ let nextQuestionsSource = fallbackQuestions;
 
 const normalize = (value) => String(value || "").normalize("NFKD").toLowerCase().replace(/[^a-z0-9]/g, "");
 const padScore = (value) => String(value).padStart(3, "0");
-const delay = (milliseconds) => reducedMotion.matches ? 0 : milliseconds;
+const delay = (milliseconds) => game.dataset.motion === "reduced" ? 0 : milliseconds;
+
+function setMotion(mode, persist = true) {
+  game.dataset.motion = mode;
+  const full = mode === "full";
+  motionButton.textContent = full ? "MOTION ON" : "MOTION OFF";
+  motionButton.setAttribute("aria-pressed", String(full));
+  motionButton.setAttribute("aria-label", full ? "Turn animations off" : "Turn animations on");
+  if (persist) {
+    try { window.localStorage.setItem("daily-expedition-motion", mode); }
+    catch { /* The motion control still works without browser storage. */ }
+  }
+}
+
+try { setMotion(window.localStorage.getItem("daily-expedition-motion") === "reduced" ? "reduced" : "full", false); }
+catch { setMotion("full", false); }
+motionButton.addEventListener("click", () => setMotion(game.dataset.motion === "full" ? "reduced" : "full"));
 
 function clearPending() {
   window.clearInterval(timerId);
@@ -127,6 +143,7 @@ function showQuestion() {
   timerCell.classList.remove("is-urgent");
   sequenceId = window.setTimeout(() => {
     phase = "question";
+    motionButton.disabled = false;
     answerInput.disabled = false;
     submitButton.disabled = false;
     deadline = Date.now() + QUESTION_SECONDS * 1000;
@@ -166,31 +183,39 @@ function submitAnswer(timedOut = false) {
 }
 
 function beginTravel() {
+  motionButton.disabled = true;
   resultScreen.classList.add("is-leaving");
   sequenceId = window.setTimeout(() => {
     resultScreen.hidden = true;
     resultScreen.classList.remove("is-leaving");
-    phase = "travel";
-    scene.classList.add("is-traveling");
-    if (current === 0) scene.dataset.time = "dusk";
-    if (current === 1) scene.dataset.time = "night";
-    moveScene(current + 1.6);
-    sequenceId = window.setTimeout(() => {
-      scene.classList.remove("is-traveling");
+    const nextTime = current === 0 ? "dusk" : "night";
+    walkTo(current + 1.8, nextTime, () => {
       current += 1;
       if (current < questions.length) showQuestion();
       else showComplete();
-    }, delay(TRAVEL_MS));
+    });
   }, delay(RESULT_FADE_MS));
 }
 
 function moveScene(step) {
   game.style.setProperty("--scene-step", String(step));
-  game.style.setProperty("--scene-scale", String(1.22 + step * 0.07));
+  game.style.setProperty("--scene-scale", String(1.22 + step * 0.09));
+}
+
+function walkTo(step, time, onArrival) {
+  phase = "travel";
+  scene.classList.add("is-traveling");
+  scene.dataset.time = time;
+  moveScene(step);
+  sequenceId = window.setTimeout(() => {
+    scene.classList.remove("is-traveling");
+    onArrival();
+  }, delay(TRAVEL_MS));
 }
 
 function showComplete() {
   phase = "complete";
+  motionButton.disabled = false;
   $("#total-score").textContent = padScore(score);
   $("#daily-best").textContent = `TODAY'S BEST · ${padScore(saveDailyBest(runKey, score))} RESONANCE`;
   $("#complete-copy").textContent = `You made it through all three stops on the ${runLabel} route.`;
@@ -220,26 +245,23 @@ function beginGame() {
   score = 0;
   results = [];
   phase = "starting";
+  motionButton.disabled = true;
   const restarting = startScreen.hidden;
-  if (restarting) scene.classList.add("is-resetting");
-  moveScene(0);
-  scene.dataset.time = "day";
-  if (restarting) {
-    // Return to the start of the route before animating the first step forward.
-    void scene.offsetWidth;
-    scene.classList.remove("is-resetting");
-  }
-  completeScreen.hidden = true;
-  scene.classList.add("is-traveling");
-  startScreen.classList.add("is-leaving");
-  // Let the scenery advance while the title clears, then reveal question one.
-  window.requestAnimationFrame(() => moveScene(0.6));
+  const openingScreen = restarting ? completeScreen : startScreen;
+  openingScreen.classList.add("is-leaving");
   sequenceId = window.setTimeout(() => {
-    startScreen.hidden = true;
-    startScreen.classList.remove("is-leaving");
-    scene.classList.remove("is-traveling");
-    showQuestion();
-  }, delay(START_TRAVEL_MS));
+    openingScreen.hidden = true;
+    openingScreen.classList.remove("is-leaving");
+    if (restarting) {
+      // Reset the completed journey after its card has faded away.
+      scene.classList.add("is-resetting");
+      moveScene(0);
+      scene.dataset.time = "day";
+      void scene.offsetWidth;
+      scene.classList.remove("is-resetting");
+    }
+    walkTo(0.8, "day", showQuestion);
+  }, delay(START_FADE_MS));
 }
 
 startButton.addEventListener("click", beginGame);
