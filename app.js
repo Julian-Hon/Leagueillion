@@ -63,7 +63,6 @@ function showQuestion() {
   answerInput.disabled = false;
   submitButton.disabled = false;
   $("#question-card").classList.remove("is-leaving");
-  scene.classList.remove("is-traveling");
   resultScreen.hidden = true;
   playScreen.hidden = false;
   updateHud();
@@ -108,7 +107,8 @@ function beginTravel() {
     resultScreen.hidden = true;
     resultScreen.classList.remove("is-leaving");
     phase = "travel";
-    scene.classList.add("is-traveling");
+    if (current === 0) scene.dataset.time = "dusk";
+    if (current === 1) scene.dataset.time = "night";
     game.style.setProperty("--scene-step", String(current + 1));
     sequenceId = window.setTimeout(() => {
       current += 1;
@@ -120,7 +120,6 @@ function beginTravel() {
 
 function showComplete() {
   phase = "complete";
-  scene.classList.remove("is-traveling");
   $("#total-score").textContent = padScore(score);
   const breakdown = $("#score-breakdown");
   breakdown.replaceChildren();
@@ -146,6 +145,7 @@ function beginGame() {
   results = [];
   phase = "starting";
   game.style.setProperty("--scene-step", "0");
+  scene.dataset.time = "day";
   completeScreen.hidden = true;
   startScreen.classList.add("is-leaving");
   sequenceId = window.setTimeout(() => {

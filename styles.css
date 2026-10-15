@@ -1,10 +1,11 @@
 /* Asset slots: replace none with url("assets/your-file.png"). See assets/README.md. */
 :root {
-  --background-main: url("assets/sunlit-pixel-woodland.png");
+  --background-day: url("assets/city-day.png");
+  --background-dusk: url("assets/city-dusk.png");
+  --background-night: url("assets/city-night.png");
   --background-far: none;
   --background-middle: none;
   --background-near: none;
-  --traveler-sprite: none;
   --font-pixel: "Courier New", Courier, monospace;
   --ink: #f8eac3;
   --muted: #c8c1a6;
@@ -32,18 +33,18 @@ button { cursor: pointer; }
 .forest { inset: auto -120vw 14%; height: 32%; background: #1b3943; clip-path: polygon(0 100%,0 42%,3% 42%,3% 25%,6% 25%,6% 40%,9% 40%,9% 67%,12% 67%,12% 32%,15% 32%,15% 14%,18% 14%,18% 32%,21% 32%,21% 74%,25% 74%,25% 48%,28% 48%,28% 22%,31% 22%,31% 45%,35% 45%,35% 80%,39% 80%,39% 36%,42% 36%,42% 20%,45% 20%,45% 40%,48% 40%,48% 72%,52% 72%,52% 45%,55% 45%,55% 26%,58% 26%,58% 44%,61% 44%,61% 77%,66% 77%,66% 36%,70% 36%,70% 14%,73% 14%,73% 34%,77% 34%,77% 70%,82% 70%,82% 40%,85% 40%,85% 22%,88% 22%,88% 45%,92% 45%,92% 70%,96% 70%,96% 38%,100% 38%,100% 100%); transition: transform 1.1s steps(12, end); transform: translateX(calc(var(--scene-step, 0) * -17vw)); }
 .ground { inset: auto -120vw 0; height: 23%; background: linear-gradient(#3f584b 0 15px, #283d3b 15px 39px, #1b3135 39px); border-top: 7px solid #667b58; transition: transform 1.1s steps(12, end); transform: translateX(calc(var(--scene-step, 0) * -27vw)); }
 .ground::after { content: ""; position: absolute; inset: 12px 0; background: repeating-linear-gradient(90deg, transparent 0 62px, #91a36a 62px 68px, transparent 68px 142px, #132d32 142px 176px); opacity: .5; }
-.scene.use-art .sky { background-image: var(--background-main); background-size: cover; background-position: center; image-rendering: pixelated; transform: scale(1.22) translateX(calc(var(--scene-step, 0) * -2.8vw)); transition: transform 1.1s steps(12, end); }
+.scene.use-art .sky { background-size: cover; background-position: center; image-rendering: pixelated; transform: scale(1.22) translateX(calc(var(--scene-step, 0) * -2.8vw)); transition: opacity 1.1s ease, transform 1.1s steps(12, end); }
+.scene.use-art .sky--day { background-image: var(--background-day); }
+.scene.use-art .sky--dusk { background-image: var(--background-dusk); opacity: 0; }
+.scene.use-art .sky--night { background-image: var(--background-night); opacity: 0; }
+.scene.use-art[data-time="dusk"] .sky--dusk, .scene.use-art[data-time="night"] .sky--dusk { opacity: 1; }
+.scene.use-art[data-time="night"] .sky--night { opacity: 1; }
 .scene.use-art .sun, .scene.use-art .mountains, .scene.use-art .forest, .scene.use-art .ground { display: none; }
 .scene.use-art::before { opacity: .06; }
 .asset-layer { inset: 0 -120vw; background-repeat: repeat-x; background-size: auto 100%; image-rendering: pixelated; transition: transform 1.1s steps(12, end); }
 .asset-layer--far { background-image: var(--background-far); transform: translateX(calc(var(--scene-step, 0) * -8vw)); }
 .asset-layer--middle { background-image: var(--background-middle); transform: translateX(calc(var(--scene-step, 0) * -17vw)); }
 .asset-layer--near { background-image: var(--background-near); transform: translateX(calc(var(--scene-step, 0) * -27vw)); }
-.traveler { bottom: calc(23% - 3px); left: 17%; width: 42px; height: 68px; background-image: var(--traveler-sprite); background-size: contain; background-position: bottom; background-repeat: no-repeat; image-rendering: pixelated; filter: drop-shadow(8px 8px 0 #102a2c88); transform: translateX(calc(var(--scene-step, 0) * 5vw)); transition: transform 1.1s steps(8, end); }
-.traveler-head { position: absolute; top: 2px; left: 12px; width: 24px; height: 22px; background: #e7c295; box-shadow: -5px -5px #1d2b35, 0 -8px #1d2b35, 8px -5px #1d2b35; }
-.traveler-body { position: absolute; top: 26px; left: 8px; width: 32px; height: 31px; background: #e8b957; box-shadow: -7px 7px #ae644e, 9px 8px #ae644e, -1px 30px #28333c, 13px 30px #28333c; }
-.traveler.has-sprite .traveler-head, .traveler.has-sprite .traveler-body { display: none; }
-.scene.is-traveling .traveler { animation: travel-bob .16s steps(2, end) infinite; }
 .screen-shade { z-index: -1; background: linear-gradient(90deg, #0b1825a8, #0b182570 48%, #0b18255a), linear-gradient(0deg, #07141bba, transparent 28%, transparent 80%, #07141b66); }
 
 .topbar { z-index: 2; display: flex; align-items: center; gap: 12px; min-height: 76px; padding: 0 clamp(20px, 5vw, 80px); border-bottom: 2px solid #edcb8040; background: #101d27b8; font-size: 12px; font-weight: 900; letter-spacing: .13em; }
@@ -117,7 +118,6 @@ button { cursor: pointer; }
 @keyframes appear { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes leave { to { opacity: 0; transform: translateY(-18px); } }
 @keyframes pop-in { from { opacity: 0; transform: scale(.86); } to { opacity: 1; transform: scale(1); } }
-@keyframes travel-bob { 50% { translate: 0 -5px; } }
 
 @media (max-width: 600px) {
   .topbar { min-height: 60px; padding-inline: 18px; }
@@ -137,7 +137,6 @@ button { cursor: pointer; }
   .question-instruction { margin-bottom: 28px; font-size: 13px; }
   .answer-row { flex-direction: column; }
   .submit-button { width: 100%; }
-  .traveler { left: 8%; }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -15,4 +15,4 @@ Until valid configuration and three active database questions are available, the
 
 Open `index.html` in a browser to play locally. The opening screen leads into three timed questions. Each question lasts 30 seconds; when time runs out, the current input is submitted automatically. An empty or unmatched answer earns 0 Resonance. The point values and obscurity descriptions currently come from each answer in the local pack or Supabase and can be revised later.
 
-See [`assets/README.md`](assets/README.md) to replace the CSS placeholder scenery, traveler, and font with your own pixel art. The scene layers already scroll at different speeds between questions.
+See [`assets/README.md`](assets/README.md) to replace the day, dusk, and night city backgrounds or add your own pixel font. The backgrounds crossfade between questions while the scene pans to the right.
