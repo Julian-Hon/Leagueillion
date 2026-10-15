@@ -1,0 +1,5 @@
+node_modules/
+supabase/.temp/
+supabase-config.js
+.agents/
+skills-lock.json
