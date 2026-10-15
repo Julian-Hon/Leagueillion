@@ -3,9 +3,9 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="A three-stop, pixel-inspired League of Legends trivia expedition." />
+    <meta name="description" content="A new route each day: three timed stops through Runeterra." />
     <title>Daily Expedition — Leagueillion</title>
-    <link rel="stylesheet" href="styles.css?v=10" />
+    <link rel="stylesheet" href="styles.css?v=11" />
   </head>
   <body>
     <main class="game" id="game">
@@ -23,23 +23,25 @@
       </div>
       <header class="topbar">
         <span class="brand-mark" aria-hidden="true">✦</span>
-        <span class="topbar-name">LEAGUEILLION</span>
-        <span class="topbar-edition">A THREE-STOP JOURNEY</span>
+        <span class="topbar-name">DAILY EXPEDITION</span>
+        <span class="topbar-edition" id="topbar-date">TODAY'S ROUTE</span>
       </header>
 
       <section class="start-screen" id="start-screen" aria-labelledby="page-title">
         <div class="start-content">
-          <p class="overline">A LITTLE JOURNEY THROUGH RUNETERRA</p>
+          <p class="overline">YOUR DAILY JOURNEY THROUGH RUNETERRA</p>
           <h1 class="logo" id="page-title"><span>DAILY</span><span>EXPEDITION</span></h1>
-          <p class="start-copy">Three stops. Thirty seconds each. How far will your knowledge take you?</p>
+          <p class="daily-date" id="daily-date"></p>
+          <p class="start-copy">One route for today. Three stops, thirty seconds each. How far will your knowledge take you?</p>
+          <div class="daily-route" id="daily-route" aria-label="Today's expedition route"></div>
           <button class="pixel-button primary-button" id="start-button" type="button">START EXPEDITION <span aria-hidden="true">→</span></button>
-          <p class="start-footnote">TYPE A CHAMPION NAME TO EARN RESONANCE</p>
+          <p class="start-footnote" id="start-footnote">TYPE A CHAMPION NAME TO EARN RESONANCE</p>
         </div>
       </section>
 
       <section class="play-screen" id="play-screen" aria-label="Expedition question" hidden>
         <div class="hud">
-          <div class="hud-cell"><span class="hud-label">STOP</span><strong id="stop-label">01 / 03</strong></div>
+          <div class="hud-cell"><span class="hud-label">TODAY'S STOP</span><strong id="stop-label">01 / 03</strong></div>
           <div class="hud-cell hud-cell--timer"><span class="hud-label">TIME LEFT</span><strong id="timer-label" role="timer" aria-live="off">00:30</strong><span class="timer-meter"><span id="timer-fill"></span></span></div>
           <div class="hud-cell hud-cell--score"><span class="hud-label">RESONANCE</span><strong id="score-label">000</strong></div>
         </div>
@@ -61,13 +63,13 @@
       </section>
 
       <section class="complete-screen" id="complete-screen" aria-labelledby="complete-title" hidden>
-        <div class="complete-card"><p class="overline">EXPEDITION COMPLETE</p><h2 id="complete-title">Journey's end.</h2><p class="complete-copy">You made it through all three stops.</p><div class="total-box"><span>TOTAL RESONANCE</span><strong id="total-score">000</strong></div><div class="score-breakdown" id="score-breakdown"></div><button class="pixel-button primary-button" id="restart-button" type="button">PLAY AGAIN <span aria-hidden="true">↻</span></button></div>
+        <div class="complete-card"><p class="overline">TODAY'S EXPEDITION COMPLETE</p><h2 id="complete-title">Journey's end.</h2><p class="complete-copy" id="complete-copy">You made it through all three stops.</p><div class="total-box"><span>TODAY'S RESONANCE</span><strong id="total-score">000</strong></div><p class="daily-best" id="daily-best"></p><div class="score-breakdown" id="score-breakdown"></div><button class="pixel-button primary-button" id="restart-button" type="button">RETRY TODAY'S ROUTE <span aria-hidden="true">↻</span></button></div>
       </section>
 
       <footer class="footer"><span id="data-status">Loading question data…</span><span>UNOFFICIAL FAN PROJECT · NOT ENDORSED BY RIOT GAMES</span></footer>
     </main>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase-config.js?v=1"></script>
-    <script src="app.js?v=9"></script>
+    <script src="app.js?v=10"></script>
   </body>
 </html>

@@ -20,6 +20,59 @@ let deadline = 0;
 let timerId = null;
 let sequenceId = null;
 let results = [];
+let dailyKey = "";
+let dailyLabel = "";
+let runKey = "";
+let runLabel = "";
+
+function localDay() {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth();
+  const date = now.getDate();
+  return {
+    key: `${year}-${String(month + 1).padStart(2, "0")}-${String(date).padStart(2, "0")}`,
+    number: Math.floor(Date.UTC(year, month, date) / 86400000),
+    label: new Intl.DateTimeFormat(undefined, { month: "long", day: "numeric", year: "numeric" }).format(now)
+  };
+}
+
+function dailyBest(key) {
+  try { return Number(window.localStorage.getItem(`daily-expedition-best:${key}`)) || 0; }
+  catch { return 0; }
+}
+
+function saveDailyBest(key, points) {
+  const best = Math.max(dailyBest(key), points);
+  try { window.localStorage.setItem(`daily-expedition-best:${key}`, String(best)); }
+  catch { /* The expedition still works when browser storage is unavailable. */ }
+  return best;
+}
+
+function refreshDailyRoute() {
+  const day = localDay();
+  dailyKey = day.key;
+  dailyLabel = day.label;
+  // A fixed permutation keeps today's route the same after refresh or replay.
+  const orders = [[0, 1, 2], [1, 2, 0], [2, 0, 1], [0, 2, 1], [2, 1, 0], [1, 0, 2]];
+  const order = orders[day.number % orders.length];
+  nextQuestions = order.map((index) => nextQuestionsSource[index]);
+  $("#daily-date").textContent = day.label.toUpperCase();
+  $("#topbar-date").textContent = day.label.toUpperCase();
+  const route = $("#daily-route");
+  route.replaceChildren();
+  nextQuestions.forEach((item, index) => {
+    const stop = document.createElement("span");
+    stop.textContent = `${String(index + 1).padStart(2, "0")}  ${item.place}`;
+    route.append(stop);
+  });
+  const best = dailyBest(dailyKey);
+  $("#start-footnote").textContent = best
+    ? `TODAY'S BEST: ${padScore(best)} RESONANCE · TYPE A CHAMPION NAME TO EARN MORE`
+    : "TYPE A CHAMPION NAME TO EARN RESONANCE";
+}
+
+let nextQuestionsSource = fallbackQuestions;
 
 const normalize = (value) => String(value || "").normalize("NFKD").toLowerCase().replace(/[^a-z0-9]/g, "");
 const padScore = (value) => String(value).padStart(3, "0");
@@ -121,6 +174,8 @@ function beginTravel() {
 function showComplete() {
   phase = "complete";
   $("#total-score").textContent = padScore(score);
+  $("#daily-best").textContent = `TODAY'S BEST · ${padScore(saveDailyBest(runKey, score))} RESONANCE`;
+  $("#complete-copy").textContent = `You made it through all three stops on the ${runLabel} route.`;
   const breakdown = $("#score-breakdown");
   breakdown.replaceChildren();
   results.forEach((result, index) => {
@@ -139,6 +194,9 @@ function showComplete() {
 
 function beginGame() {
   clearPending();
+  refreshDailyRoute();
+  runKey = dailyKey;
+  runLabel = dailyLabel;
   questions = nextQuestions;
   current = 0;
   score = 0;
@@ -206,7 +264,8 @@ async function loadSupabaseQuestions() {
     return;
   }
 
-  nextQuestions = loaded;
+  nextQuestionsSource = loaded;
+  refreshDailyRoute();
   dataStatus.textContent = "QUESTION PACK READY";
 }
 
@@ -219,4 +278,5 @@ async function initialize() {
   }
 }
 
+refreshDailyRoute();
 initialize();
