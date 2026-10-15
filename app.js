@@ -9,7 +9,8 @@ const startButton = $("#start-button"), restartButton = $("#restart-button"), an
 const dataStatus = $("#data-status"), timerLabel = $("#timer-label"), timerFill = $("#timer-fill"), timerCell = $(".hud-cell--timer");
 const QUESTION_SECONDS = 30;
 const RESULT_MS = 2300;
-const TRAVEL_MS = 1100;
+const START_TRAVEL_MS = 1150;
+const TRAVEL_MS = 1350;
 const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 let questions = fallbackQuestions;
 let nextQuestions = fallbackQuestions;
@@ -160,15 +161,22 @@ function beginTravel() {
     resultScreen.hidden = true;
     resultScreen.classList.remove("is-leaving");
     phase = "travel";
+    scene.classList.add("is-traveling");
     if (current === 0) scene.dataset.time = "dusk";
     if (current === 1) scene.dataset.time = "night";
-    game.style.setProperty("--scene-step", String(current + 1));
+    moveScene(current + 1.6);
     sequenceId = window.setTimeout(() => {
+      scene.classList.remove("is-traveling");
       current += 1;
       if (current < questions.length) showQuestion();
       else showComplete();
     }, delay(TRAVEL_MS));
   }, delay(300));
+}
+
+function moveScene(step) {
+  game.style.setProperty("--scene-step", String(step));
+  game.style.setProperty("--scene-scale", String(1.22 + step * 0.07));
 }
 
 function showComplete() {
@@ -202,15 +210,26 @@ function beginGame() {
   score = 0;
   results = [];
   phase = "starting";
-  game.style.setProperty("--scene-step", "0");
+  const restarting = startScreen.hidden;
+  if (restarting) scene.classList.add("is-resetting");
+  moveScene(0);
   scene.dataset.time = "day";
+  if (restarting) {
+    // Return to the start of the route before animating the first step forward.
+    void scene.offsetWidth;
+    scene.classList.remove("is-resetting");
+  }
   completeScreen.hidden = true;
+  scene.classList.add("is-traveling");
   startScreen.classList.add("is-leaving");
+  // Let the scenery advance while the title clears, then reveal question one.
+  window.requestAnimationFrame(() => moveScene(0.6));
   sequenceId = window.setTimeout(() => {
     startScreen.hidden = true;
     startScreen.classList.remove("is-leaving");
+    scene.classList.remove("is-traveling");
     showQuestion();
-  }, delay(380));
+  }, delay(START_TRAVEL_MS));
 }
 
 startButton.addEventListener("click", beginGame);

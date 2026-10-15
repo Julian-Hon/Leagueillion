@@ -17,4 +17,4 @@ Open `index.html` in a browser to play locally. The opening screen leads into th
 
 The landing screen displays the player's local date and that day's three-stop route. The route order changes by date and stays consistent for the day, including on replay. The best score for each date is saved in that browser's local storage. The current question pack contains three stops, so daily routes change their order; add more questions and route-selection rules if you want new trivia content every day.
 
-See [`assets/README.md`](assets/README.md) to replace the day, dusk, and night city backgrounds or add your own pixel font. The backgrounds crossfade between questions while the scene pans to the right.
+See [`assets/README.md`](assets/README.md) to replace the day, dusk, and night city backgrounds or add your own pixel font. Starting an expedition fades the menu into the first question while the scenery moves forward. Between questions, the backgrounds crossfade and zoom in small steps to suggest walking onward.
