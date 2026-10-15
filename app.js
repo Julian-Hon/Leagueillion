@@ -9,8 +9,10 @@ const startButton = $("#start-button"), restartButton = $("#restart-button"), an
 const dataStatus = $("#data-status"), timerLabel = $("#timer-label"), timerFill = $("#timer-fill"), timerCell = $(".hud-cell--timer");
 const QUESTION_SECONDS = 30;
 const RESULT_MS = 2300;
-const START_TRAVEL_MS = 1150;
-const TRAVEL_MS = 1350;
+const START_TRAVEL_MS = 2300;
+const TRAVEL_MS = 2300;
+const RESULT_FADE_MS = 650;
+const QUESTION_FADE_MS = 1000;
 const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 let questions = fallbackQuestions;
 let nextQuestions = fallbackQuestions;
@@ -106,7 +108,7 @@ function updateTimer() {
 }
 
 function showQuestion() {
-  phase = "question";
+  phase = "arriving";
   const item = questions[current];
   $("#question-index").textContent = `QUESTION ${String(current + 1).padStart(2, "0")}`;
   $("#question-place").textContent = item.place.toUpperCase();
@@ -114,16 +116,24 @@ function showQuestion() {
   $("#question-instruction").textContent = item.instruction;
   $("#form-message").textContent = "";
   answerInput.value = "";
-  answerInput.disabled = false;
-  submitButton.disabled = false;
+  answerInput.disabled = true;
+  submitButton.disabled = true;
   $("#question-card").classList.remove("is-leaving");
   resultScreen.hidden = true;
   playScreen.hidden = false;
   updateHud();
-  deadline = Date.now() + QUESTION_SECONDS * 1000;
-  updateTimer();
-  timerId = window.setInterval(updateTimer, 100);
-  answerInput.focus({ preventScroll: true });
+  timerLabel.textContent = "00:30";
+  timerFill.style.width = "100%";
+  timerCell.classList.remove("is-urgent");
+  sequenceId = window.setTimeout(() => {
+    phase = "question";
+    answerInput.disabled = false;
+    submitButton.disabled = false;
+    deadline = Date.now() + QUESTION_SECONDS * 1000;
+    updateTimer();
+    timerId = window.setInterval(updateTimer, 100);
+    answerInput.focus({ preventScroll: true });
+  }, delay(QUESTION_FADE_MS));
 }
 
 function submitAnswer(timedOut = false) {
@@ -171,7 +181,7 @@ function beginTravel() {
       if (current < questions.length) showQuestion();
       else showComplete();
     }, delay(TRAVEL_MS));
-  }, delay(300));
+  }, delay(RESULT_FADE_MS));
 }
 
 function moveScene(step) {
