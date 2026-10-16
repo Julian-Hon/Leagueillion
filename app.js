@@ -189,7 +189,7 @@ function beginTravel() {
     resultScreen.hidden = true;
     resultScreen.classList.remove("is-leaving");
     const nextTime = current === 0 ? "dusk" : "night";
-    walkTo(current + 1.8, nextTime, () => {
+    walkTo(current + 1, nextTime, () => {
       current += 1;
       if (current < questions.length) showQuestion();
       else showComplete();
@@ -260,7 +260,7 @@ function beginGame() {
       void scene.offsetWidth;
       scene.classList.remove("is-resetting");
     }
-    walkTo(0.8, "day", showQuestion);
+    showQuestion();
   }, delay(START_FADE_MS));
 }
 

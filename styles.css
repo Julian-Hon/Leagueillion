@@ -25,7 +25,6 @@ button { cursor: pointer; }
 
 .game { position: relative; display: grid; grid-template-rows: auto 1fr auto; min-height: 100svh; overflow: hidden; isolation: isolate; }
 .scene { position: absolute; z-index: -2; inset: -8px; overflow: hidden; pointer-events: none; }
-.scene.is-traveling { animation: walking-bob .9s ease-in-out infinite; }
 .scene > * { position: absolute; }
 .sky { inset: 0; background: linear-gradient(#132b3d 0%, #244459 43%, #856e65 69%, #d2a46d 100%); }
 .scene::before { content: ""; position: absolute; z-index: 10; inset: 0; opacity: .18; background-image: linear-gradient(transparent 50%, #06111b 50%); background-size: 100% 4px; }
@@ -131,7 +130,6 @@ button { cursor: pointer; }
 @keyframes pop-in { from { opacity: 0; transform: scale(.86); } to { opacity: 1; transform: scale(1); } }
 @keyframes menu-depart { to { opacity: 0; transform: translateY(-12px); } }
 @keyframes question-arrive { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes walking-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(5px); } }
 
 @media (max-width: 600px) {
   .topbar { min-height: 60px; padding-inline: 18px; }
