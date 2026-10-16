@@ -24,7 +24,7 @@ button { cursor: pointer; }
 [hidden] { display: none !important; }
 
 .game { position: relative; display: grid; grid-template-rows: auto 1fr auto; min-height: 100svh; overflow: hidden; isolation: isolate; }
-.scene { position: absolute; z-index: -2; inset: -8px; overflow: hidden; pointer-events: none; }
+.scene { position: absolute; z-index: -2; inset: 0; overflow: hidden; pointer-events: none; }
 .scene > * { position: absolute; }
 .sky { inset: 0; background: linear-gradient(#132b3d 0%, #244459 43%, #856e65 69%, #d2a46d 100%); }
 .scene::before { content: ""; position: absolute; z-index: 10; inset: 0; opacity: .18; background-image: linear-gradient(transparent 50%, #06111b 50%); background-size: 100% 4px; }
