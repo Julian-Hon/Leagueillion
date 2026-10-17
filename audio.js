@@ -38,7 +38,7 @@ window.expeditionAudio = (() => {
     source.loop = true;
     filter.type = "lowpass";
     filter.frequency.value = 480;
-    level.gain.value = 0.075;
+    level.gain.value = 0.16;
     source.connect(filter).connect(level).connect(master);
     source.start();
   }
@@ -60,21 +60,13 @@ window.expeditionAudio = (() => {
       oscillator.type = "sine";
       oscillator.frequency.value = frequency;
       envelope.gain.setValueAtTime(0.0001, startAt);
-      envelope.gain.linearRampToValueAtTime(0.055, startAt + 1.8);
-      envelope.gain.setValueAtTime(0.055, startAt + 3.8);
+      envelope.gain.linearRampToValueAtTime(0.038, startAt + 1.8);
+      envelope.gain.setValueAtTime(0.038, startAt + 3.8);
       envelope.gain.linearRampToValueAtTime(0.0001, startAt + 7.8);
       oscillator.connect(envelope).connect(master);
       oscillator.start(startAt);
       oscillator.stop(startAt + 7.85);
     });
-  }
-
-  function birdCall() {
-    if (context && !muted) {
-      tone(1050, 1420, 0.16, 0.075);
-      tone(1180, 890, 0.2, 0.06, "sine", 0.18);
-    }
-    window.setTimeout(birdCall, 10000 + Math.random() * 8000);
   }
 
   function ensureContext() {
@@ -87,7 +79,6 @@ window.expeditionAudio = (() => {
       makeWind();
       padChord();
       window.setInterval(padChord, 6500);
-      window.setTimeout(birdCall, 5000);
     } catch (error) {
       console.warn("Expedition audio is unavailable:", error);
       context = null;
