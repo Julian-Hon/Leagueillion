@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="A new route each day: three timed stops through Runeterra." />
     <title>Daily Expedition — Leagueillion</title>
-    <link rel="stylesheet" href="styles.css?v=17" />
+    <link rel="stylesheet" href="styles.css?v=18" />
   </head>
   <body>
     <main class="game" id="game" data-motion="full">
@@ -20,12 +20,17 @@
         <div class="forest"></div>
         <div class="ground"></div>
         <div class="asset-layer asset-layer--near"></div>
+        <div class="scene-life">
+          <span class="mote"></span><span class="mote"></span><span class="mote"></span><span class="mote"></span>
+          <span class="mote"></span><span class="mote"></span><span class="mote"></span><span class="mote"></span>
+        </div>
       </div>
       <header class="topbar">
         <span class="brand-mark" aria-hidden="true">✦</span>
         <span class="topbar-name">DAILY EXPEDITION</span>
         <span class="topbar-edition" id="topbar-date">TODAY'S ROUTE</span>
         <button class="motion-toggle" id="motion-toggle" type="button" aria-pressed="true" aria-label="Turn animations off">MOTION ON</button>
+        <button class="motion-toggle sound-toggle" id="sound-toggle" type="button" aria-pressed="true" aria-label="Mute sound">SOUND ON</button>
       </header>
 
       <section class="start-screen" id="start-screen" aria-labelledby="page-title">
@@ -63,6 +68,20 @@
         <div class="result-card"><p class="overline" id="result-kicker">ANSWER ACCEPTED</p><strong class="result-points" id="result-points">+10</strong><p class="result-description" id="result-description"></p></div>
       </section>
 
+      <section class="journey-screen" id="journey-screen" aria-label="Expedition distance" aria-live="polite" hidden>
+        <div class="journey-card">
+          <p class="overline">THE JOURNEY SO FAR</p>
+          <div class="journey-details"><span id="journey-stop">STOP 01 / 03</span><strong id="journey-total">010 / 300</strong></div>
+          <div class="journey-track" id="journey-track" role="img" aria-label="Progress toward a perfect expedition">
+            <span class="journey-fill" id="journey-fill"></span>
+            <span class="journey-marker" id="journey-marker" aria-hidden="true">✦</span>
+            <span class="journey-goal" aria-hidden="true">★</span>
+          </div>
+          <div class="journey-endpoints"><span>TRAILHEAD</span><span id="journey-goal-label">PERFECT · 300</span></div>
+          <p class="journey-caption" id="journey-caption"></p>
+        </div>
+      </section>
+
       <section class="complete-screen" id="complete-screen" aria-labelledby="complete-title" hidden>
         <div class="complete-card"><p class="overline">TODAY'S EXPEDITION COMPLETE</p><h2 id="complete-title">Journey's end.</h2><p class="complete-copy" id="complete-copy">You made it through all three stops.</p><div class="total-box"><span>TODAY'S RESONANCE</span><strong id="total-score">000</strong></div><p class="daily-best" id="daily-best"></p><div class="score-breakdown" id="score-breakdown"></div><button class="pixel-button primary-button" id="restart-button" type="button">RETRY TODAY'S ROUTE <span aria-hidden="true">↻</span></button></div>
       </section>
@@ -71,6 +90,7 @@
     </main>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase-config.js?v=1"></script>
-    <script src="app.js?v=15"></script>
+    <script src="audio.js?v=2"></script>
+    <script src="app.js?v=16"></script>
   </body>
 </html>

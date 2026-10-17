@@ -4,20 +4,24 @@ const fallbackQuestions = [
   { place: "Noxus", question: "Name a champion from Noxus.", instruction: "The final gate rewards the deepest cut of knowledge.", answers: [["Darius", ["darius"], "Familiar", 10], ["Katarina", ["katarina", "katarina du couteau"], "Familiar", 10], ["Draven", ["draven"], "Known", 25], ["LeBlanc", ["leblanc", "le blanc"], "Known", 25], ["Riven", ["riven"], "Uncommon", 50], ["Talon", ["talon"], "Uncommon", 50], ["Cassiopeia", ["cassiopeia", "cassiopeia du couteau"], "Deep Lore", 75], ["Sion", ["sion"], "Deep Lore", 75], ["Kled", ["kled"], "Legendary", 100]] }
 ];
 const $ = (selector) => document.querySelector(selector);
-const game = $("#game"), scene = $("#scene"), startScreen = $("#start-screen"), playScreen = $("#play-screen"), resultScreen = $("#result-screen"), completeScreen = $("#complete-screen");
+const game = $("#game"), scene = $("#scene"), startScreen = $("#start-screen"), playScreen = $("#play-screen"), resultScreen = $("#result-screen"), journeyScreen = $("#journey-screen"), completeScreen = $("#complete-screen");
 const startButton = $("#start-button"), restartButton = $("#restart-button"), answerForm = $("#answer-form"), answerInput = $("#answer-input"), submitButton = answerForm.querySelector("button");
 const motionButton = $("#motion-toggle");
+const soundButton = $("#sound-toggle"), sound = window.expeditionAudio;
 const dataStatus = $("#data-status"), timerLabel = $("#timer-label"), timerFill = $("#timer-fill"), timerCell = $(".hud-cell--timer");
 const QUESTION_SECONDS = 30;
 const RESULT_MS = 2300;
 const START_FADE_MS = 1700;
 const TRAVEL_MS = 3600;
 const RESULT_FADE_MS = 1100;
+const JOURNEY_MS = 2850;
+const JOURNEY_FADE_MS = 650;
 const QUESTION_FADE_MS = 1500;
 let questions = fallbackQuestions;
 let nextQuestions = fallbackQuestions;
 let current = 0;
 let score = 0;
+let maxScore = 300;
 let phase = "landing";
 let deadline = 0;
 let timerId = null;
@@ -97,6 +101,29 @@ try { setMotion(window.localStorage.getItem("daily-expedition-motion") === "redu
 catch { setMotion("full", false); }
 motionButton.addEventListener("click", () => setMotion(game.dataset.motion === "full" ? "reduced" : "full"));
 
+function setSoundMuted(muted, persist = true) {
+  sound.setMuted(muted, persist);
+  soundButton.textContent = muted ? "SOUND OFF" : "SOUND ON";
+  soundButton.setAttribute("aria-pressed", String(!muted));
+  soundButton.setAttribute("aria-label", muted ? "Unmute sound" : "Mute sound");
+  if (persist) {
+    try { window.localStorage.setItem("daily-expedition-muted", String(muted)); }
+    catch { /* The sound control still works without browser storage. */ }
+  }
+}
+
+if (sound.supported) {
+  let savedMuted = false;
+  try { savedMuted = window.localStorage.getItem("daily-expedition-muted") === "true"; }
+  catch { /* Use sound on when browser storage is unavailable. */ }
+  setSoundMuted(savedMuted, false);
+  soundButton.addEventListener("click", () => setSoundMuted(soundButton.getAttribute("aria-pressed") === "true"));
+} else {
+  soundButton.textContent = "SOUND N/A";
+  soundButton.setAttribute("aria-label", "Sound unavailable in this browser");
+  soundButton.disabled = true;
+}
+
 function clearPending() {
   window.clearInterval(timerId);
   window.clearTimeout(sequenceId);
@@ -156,12 +183,16 @@ function showQuestion() {
 function submitAnswer(timedOut = false) {
   if (phase !== "question") return;
   if (!timedOut && Date.now() >= deadline) timedOut = true;
+  if (!timedOut) sound.play("submit");
   const submitted = normalize(answerInput.value);
   const match = questions[current].answers.find(([, aliases]) => aliases.some((alias) => normalize(alias) === submitted));
   if (!match && !timedOut) {
+    sound.play("invalid");
     $("#form-message").textContent = submitted ? "That answer isn't in this stop's answer bank. Try another." : "Type a champion name first.";
     return;
   }
+
+  sound.play(match ? "correct" : "timeout");
 
   phase = "result";
   window.clearInterval(timerId);
@@ -179,22 +210,54 @@ function submitAnswer(timedOut = false) {
   playScreen.hidden = true;
   resultScreen.hidden = false;
   resultScreen.classList.remove("is-leaving");
-  sequenceId = window.setTimeout(beginTravel, delay(RESULT_MS));
+  sequenceId = window.setTimeout(showJourneyProgress, delay(RESULT_MS));
 }
 
-function beginTravel() {
+function showJourneyProgress() {
   motionButton.disabled = true;
   resultScreen.classList.add("is-leaving");
   sequenceId = window.setTimeout(() => {
     resultScreen.hidden = true;
     resultScreen.classList.remove("is-leaving");
+    phase = "journey";
+    const points = results[current].points;
+    const from = Math.min(100, (score - points) / maxScore * 100);
+    const to = Math.min(100, score / maxScore * 100);
+    $("#journey-stop").textContent = `STOP ${String(current + 1).padStart(2, "0")} / 03`;
+    $("#journey-total").textContent = `${padScore(score)} / ${padScore(maxScore)}`;
+    $("#journey-goal-label").textContent = `PERFECT · ${padScore(maxScore)}`;
+    $("#journey-caption").textContent = points
+      ? `+${points} Resonance carries you farther along today's route.`
+      : "No ground gained at this stop. The trail continues.";
+    $("#journey-track").setAttribute("aria-label", `${score} of ${maxScore} possible Resonance earned`);
+    const marker = $("#journey-marker"), fill = $("#journey-fill");
+    marker.style.left = `${from}%`;
+    fill.style.width = `${from}%`;
+    journeyScreen.hidden = false;
+    void marker.offsetWidth;
+    marker.style.left = `${to}%`;
+    fill.style.width = `${to}%`;
+    sound.play("progress", points);
+    sequenceId = window.setTimeout(beginTravel, delay(JOURNEY_MS));
+  }, delay(RESULT_FADE_MS));
+}
+
+function beginTravel() {
+  journeyScreen.classList.add("is-leaving");
+  sequenceId = window.setTimeout(() => {
+    journeyScreen.hidden = true;
+    journeyScreen.classList.remove("is-leaving");
+    if (current === questions.length - 1) {
+      showComplete();
+      return;
+    }
     const nextTime = current === 0 ? "dusk" : "night";
+    sound.play("walk");
     walkTo(current + 1, nextTime, () => {
       current += 1;
-      if (current < questions.length) showQuestion();
-      else showComplete();
+      showQuestion();
     });
-  }, delay(RESULT_FADE_MS));
+  }, delay(JOURNEY_FADE_MS));
 }
 
 function moveScene(step) {
@@ -216,6 +279,7 @@ function walkTo(step, time, onArrival) {
 function showComplete() {
   phase = "complete";
   motionButton.disabled = false;
+  sound.play("complete");
   $("#total-score").textContent = padScore(score);
   $("#daily-best").textContent = `TODAY'S BEST · ${padScore(saveDailyBest(runKey, score))} RESONANCE`;
   $("#complete-copy").textContent = `You made it through all three stops on the ${runLabel} route.`;
@@ -237,17 +301,20 @@ function showComplete() {
 
 function beginGame() {
   clearPending();
+  sound.play("start");
   refreshDailyRoute();
   runKey = dailyKey;
   runLabel = dailyLabel;
   questions = nextQuestions;
   current = 0;
   score = 0;
+  maxScore = questions.reduce((total, question) => total + Math.max(...question.answers.map((answer) => Number(answer[3]) || 0)), 0) || 300;
   results = [];
   phase = "starting";
   motionButton.disabled = true;
   const restarting = startScreen.hidden;
   const openingScreen = restarting ? completeScreen : startScreen;
+  journeyScreen.hidden = true;
   openingScreen.classList.add("is-leaving");
   sequenceId = window.setTimeout(() => {
     openingScreen.hidden = true;
